@@ -242,7 +242,7 @@ function App() {
         </table>
 
         {/* --- APPROVED DATE --- */}
-        <div style={{ display: "flex", justifyContent: "center" }}>
+        {/* <div style={{ display: "flex", justifyContent: "center" }}>
           <h2>Approved Date</h2>
         </div>
         <table border="1" style={{ width: "100%", borderCollapse: "collapse", marginBottom: "30px" }}>
@@ -260,7 +260,7 @@ function App() {
               <td style={{ padding: "10px", textAlign: "center" }}>{getCol(parentItem, "date_mm0w73yx")}</td>
             </tr>
           </tbody>
-        </table>
+        </table> */}
 
         <div style={{display: "flex", justifyContent: "center"}}>
           <h2>Memo(Accompany and etc)</h2>
@@ -298,8 +298,8 @@ function App() {
                     padding: "8px",
                   }}
                 >
-                  <strong>Applicant / Manager</strong>
-                  <div style={{ fontSize: "12px" }}>(as applicable)</div>
+                  <strong>Manager</strong>
+                  {/* <div style={{ fontSize: "12px" }}>(as applicable)</div> */}
                 </td>
                 <td
                   style={{
@@ -322,7 +322,7 @@ function App() {
                     padding: "8px",
                   }}
                 >
-                  <div>(Applicant)</div>
+                  {getCol(parentItem, "multiple_person_mm0nc8ye")}
                   <div
                     style={{
                       marginTop: "30px",
@@ -331,7 +331,7 @@ function App() {
                       marginLeft: "15%",
                     }}
                   />
-                  <div style={{ marginTop: "15px" }}>(Manager)</div>
+                  <div style={{ marginTop: "15px" }}>{getCol(parentItem, "date_mm0w2v3q")}</div>
                 </td>
 
                 <td
@@ -343,7 +343,7 @@ function App() {
                     padding: "8px",
                   }}
                 >
-                  <div>(Check)</div>
+                  {getCol(parentItem, "multiple_person_mm0n3n7m")}
                   <div
                     style={{
                       marginTop: "30px",
@@ -352,8 +352,8 @@ function App() {
                       marginLeft: "15%",
                     }}
                   />
-                  <div style={{ marginTop: "10px", fontSize: "12px" }}>
-                    Within budget
+                  <div style={{ marginTop: "15px" }}>
+                   {getCol(parentItem, "date_mm0ww9mm")}
                   </div>
                 </td>
               </tr>
@@ -400,7 +400,7 @@ function App() {
                     padding: "8px",
                   }}
                 >
-                  <div>(Approve)</div>
+                  {getCol(parentItem, "multiple_person_mm0pgsjy")}
                   <div
                     style={{
                       marginTop: "40px",
@@ -410,6 +410,9 @@ function App() {
                     }}
                   />
                 </td>
+
+                  {getCol(parentItem, "date_mm0w73yx")}
+
               </tr>
             </tbody>
           </table>
