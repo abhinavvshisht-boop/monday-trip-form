@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import mondaySdk from "monday-sdk-js";
-import html2pdf from "html2pdf.js"; // Import the new library
+import html2pdf from "html2pdf.js";
 
 const monday = mondaySdk();
 
@@ -10,7 +10,6 @@ function App() {
   const [parentItem, setParentItem] = useState(null);
   const [loading, setLoading] = useState(true);
   
-  // Create a reference to the form content
   const contentRef = useRef();
 
   useEffect(() => {
@@ -23,13 +22,26 @@ function App() {
   }, []);
 
   const fetchSubitems = (itemId) => {
+    // UPDATED QUERY: Added fragment to support FormulaValue display_value
     monday.api(`query { 
       items (ids: ${itemId}) { 
         name
-        column_values { id text }
+        column_values { 
+          id 
+          text 
+          ... on FormulaValue {
+            display_value
+          }
+        }
         subitems { 
           name 
-          column_values { id text } 
+          column_values { 
+            id 
+            text 
+            ... on FormulaValue {
+              display_value
+            }
+          } 
         } 
       } 
     }`).then((res) => {
@@ -44,10 +56,12 @@ function App() {
   const getCol = (item, columnId) => {
     if (!item || !item.column_values) return "";
     const column = item.column_values.find(c => c.id === columnId);
-    return column ? column.text : ""; 
+    if (!column) return "";
+    
+    // UPDATED LOGIC: Prioritize display_value (for formulas) then fallback to text
+    return column.display_value !== undefined ? column.display_value : column.text; 
   };
 
-  // --- NEW: PDF DOWNLOAD FUNCTION ---
   const downloadPDF = () => {
     const element = contentRef.current;
     const opt = {
@@ -57,17 +71,12 @@ function App() {
       html2canvas:  { scale: 2 },
       jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
-
-    // New Promise-based usage:
     html2pdf().set(opt).from(element).save();
   };
-
-  // if (loading) return <div style={{padding: "60px"}}>Fetching data from monday.com...</div>;
 
   return (
     <div style={{ padding: "40px", fontFamily: "Arial, sans-serif" }}>
       
-      {/* 1. The Download Button (Hidden from PDF) */}
       <div style={{ marginBottom: "20px", display: "flex", justifyContent: "flex-end" }}>
         <button 
           onClick={downloadPDF}
@@ -85,7 +94,6 @@ function App() {
         </button>
       </div>
 
-      {/* 2. The Content Wrapper (Everything inside here goes into the PDF) */}
       <div ref={contentRef} style={{ padding: "20px" }}>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <h1>Business Trip Approval Form (Form#1)</h1>
@@ -241,27 +249,6 @@ function App() {
           </tbody>
         </table>
 
-        {/* --- APPROVED DATE --- */}
-        {/* <div style={{ display: "flex", justifyContent: "center" }}>
-          <h2>Approved Date</h2>
-        </div>
-        <table border="1" style={{ width: "100%", borderCollapse: "collapse", marginBottom: "30px" }}>
-          <thead>
-            <tr style={{ backgroundColor: "#f2f2f2" }}>
-              <th style={{ padding: "10px" }}>Manager (L1 - Approver) Date</th>
-              <th style={{ padding: "10px" }}>Department Head (Admin) Approval Date</th>
-              <th style={{ padding: "10px" }}>MD Approval Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td style={{ padding: "10px", textAlign: "center" }}>{getCol(parentItem, "date_mm0w2v3q")}</td>
-              <td style={{ padding: "10px", textAlign: "center" }}>{getCol(parentItem, "date_mm0ww9mm")}</td>
-              <td style={{ padding: "10px", textAlign: "center" }}>{getCol(parentItem, "date_mm0w73yx")}</td>
-            </tr>
-          </tbody>
-        </table> */}
-
         <div style={{display: "flex", justifyContent: "center"}}>
           <h2>Memo(Accompany and etc)</h2>
         </div>
@@ -291,82 +278,31 @@ function App() {
           >
             <tbody>
               <tr>
-                <td
-                  style={{
-                    border: "1px solid black",
-                    textAlign: "center",
-                    padding: "8px",
-                  }}
-                >
+                <td style={{ border: "1px solid black", textAlign: "center", padding: "8px" }}>
                   <strong>Manager</strong>
-                  {/* <div style={{ fontSize: "12px" }}>(as applicable)</div> */}
                 </td>
-                <td
-                  style={{
-                    border: "1px solid black",
-                    textAlign: "center",
-                    padding: "8px",
-                  }}
-                >
+                <td style={{ border: "1px solid black", textAlign: "center", padding: "8px" }}>
                   <strong>Administration</strong>
                 </td>
               </tr>
 
               <tr>
-                <td
-                  style={{
-                    border: "1px solid black",
-                    height: "100px",
-                    verticalAlign: "top",
-                    textAlign: "center",
-                    padding: "8px",
-                  }}
-                >
+                <td style={{ border: "1px solid black", height: "100px", verticalAlign: "top", textAlign: "center", padding: "8px" }}>
                   {getCol(parentItem, "multiple_person_mm0nc8ye")}
-                  <div
-                    style={{
-                      marginTop: "30px",
-                      borderTop: "1px solid black",
-                      width: "70%",
-                      marginLeft: "15%",
-                    }}
-                  />
+                  <div style={{ marginTop: "30px", borderTop: "1px solid black", width: "70%", marginLeft: "15%" }} />
                   <div style={{ marginTop: "15px" }}>{getCol(parentItem, "date_mm0w2v3q")}</div>
                 </td>
 
-                <td
-                  style={{
-                    border: "1px solid black",
-                    height: "100px",
-                    verticalAlign: "top",
-                    textAlign: "center",
-                    padding: "8px",
-                  }}
-                >
+                <td style={{ border: "1px solid black", height: "100px", verticalAlign: "top", textAlign: "center", padding: "8px" }}>
                   {getCol(parentItem, "multiple_person_mm0n3n7m")}
-                  <div
-                    style={{
-                      marginTop: "30px",
-                      borderTop: "1px solid black",
-                      width: "70%",
-                      marginLeft: "15%",
-                    }}
-                  />
-                  <div style={{ marginTop: "15px" }}>
-                   {getCol(parentItem, "date_mm0ww9mm")}
-                  </div>
+                  <div style={{ marginTop: "30px", borderTop: "1px solid black", width: "70%", marginLeft: "15%" }} />
+                  <div style={{ marginTop: "15px" }}>{getCol(parentItem, "date_mm0ww9mm")}</div>
                 </td>
               </tr>
             </tbody>
           </table>
 
-          {/* CONNECTING LINE */}
-          <div
-            style={{
-              width: "80px",
-              borderTop: "2px solid black",
-            }}
-          />
+          <div style={{ width: "80px", borderTop: "2px solid black" }} />
 
           {/* RIGHT BOX */}
           <table
@@ -379,49 +315,17 @@ function App() {
           >
             <tbody>
               <tr>
-                <td
-                  style={{
-                    border: "1px solid black",
-                    textAlign: "center",
-                    padding: "8px",
-                  }}
-                >
+                <td style={{ border: "1px solid black", textAlign: "center", padding: "8px" }}>
                   <strong>Managing Director</strong>
                 </td>
               </tr>
-
               <tr>
-                <td
-                  style={{
-                    border: "1px solid black",
-                    height: "120px",
-                    verticalAlign: "top",
-                    textAlign: "center",
-                    padding: "8px",
-                  }}
-                >
+                <td style={{ border: "1px solid black", height: "120px", verticalAlign: "top", textAlign: "center", padding: "8px" }}>
                   {getCol(parentItem, "multiple_person_mm0pgsjy")}
-                  <div
-                    style={{
-                      marginTop: "40px",
-                      borderTop: "1px solid black",
-                      width: "70%",
-                      marginLeft: "15%",
-                    }}
-                  />
-                   <div
-                    style={{
-                      marginTop: "20px",
-                      // borderTop: "1px solid black",
-                      width: "70%",
-                      marginLeft: "15%",
-                    }}
-                  />
-                   {getCol(parentItem, "date_mm0w73yx")}
+                  <div style={{ marginTop: "40px", borderTop: "1px solid black", width: "70%", marginLeft: "15%" }} />
+                  <div style={{ marginTop: "20px" }} />
+                  {getCol(parentItem, "date_mm0w73yx")}
                 </td>
-
-                 
-
               </tr>
             </tbody>
           </table>
