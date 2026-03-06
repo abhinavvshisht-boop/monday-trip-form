@@ -411,8 +411,8 @@ function App() {
                   />
                    <div
                     style={{
-                      marginTop: "30px",
-                      borderTop: "1px solid black",
+                      marginTop: "20px",
+                      // borderTop: "1px solid black",
                       width: "70%",
                       marginLeft: "15%",
                     }}
