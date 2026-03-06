@@ -409,6 +409,14 @@ function App() {
                       marginLeft: "15%",
                     }}
                   />
+                   <div
+                    style={{
+                      marginTop: "30px",
+                      borderTop: "1px solid black",
+                      width: "70%",
+                      marginLeft: "15%",
+                    }}
+                  />
                    {getCol(parentItem, "date_mm0w73yx")}
                 </td>
 
