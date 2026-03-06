@@ -409,9 +409,10 @@ function App() {
                       marginLeft: "15%",
                     }}
                   />
+                   {getCol(parentItem, "date_mm0w73yx")}
                 </td>
 
-                  {getCol(parentItem, "date_mm0w73yx")}
+                 
 
               </tr>
             </tbody>
